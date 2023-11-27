@@ -4,28 +4,39 @@ JWT Authentication with Spring Boot 3.0
 
 We will see how to configure InMemory user and jwt authentication using latest spring boot 3.0.
 We will create one protected endpoint and try to secure endpoint using spring boot security.
+
 Create new Spring Boot Project
 Go to spring initializer and create new project with dependencies
 
-add the following dependencies
+Add the following dependencies
 -------------------------------
 For Web
+```
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
+```
+
 For security
+```
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
+```
+
 Lombok
+```
 <dependency>
     <groupId>org.projectlombok</groupId>
     <artifactId>lombok</artifactId>
     <optional>true</optional>
 </dependency>
+```
+
 For JWT
+```
  <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
@@ -48,9 +59,11 @@ For JWT
     <version>0.11.5</version>
     <scope>runtime</scope>
 </dependency>
- 
+ ```
 
 Create End Point to be secured
+
+```
 @RestController
 public class HomeController {
 
@@ -64,6 +77,7 @@ public class HomeController {
 
 
 }
+```
 
 Create InMemory user with UserDetailService Bean
 Create UserDetailService bean and write the InMemory user implementation
@@ -71,7 +85,7 @@ Create UserDetailService bean and write the InMemory user implementation
 Create CustomConfig class and create bean and also create two important bean PasswordEncoder and AuthenticationManager so that we can use later.
 
  
-
+```
 @Configuration
 class MyConfig {
     @Bean
@@ -93,6 +107,8 @@ class MyConfig {
         return builder.getAuthenticationManager();
     }
 }
+```
+
 Now we can login with given username and password by default spring security provide form login .
 
 open browser and open
@@ -108,6 +124,7 @@ Steps to implement jwt token:
 
 2)  Create Class JWTAthenticationEntryPoint that implement AuthenticationEntryPoint. Method of this class is called whenever as exception is thrown due to unauthenticated user trying to access the resource that required authentication.
 
+```
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
@@ -117,8 +134,11 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         writer.println("Access Denied !! " + authException.getMessage());
     }
 }
+```
+
 3)  Create JWTHelper  class This class contains method related to perform operations with jwt token like generateToken, validateToken etc.
 
+```
 @Component
 public class JwtHelper {
 
@@ -180,13 +200,21 @@ public class JwtHelper {
 
 
 }
+```
+
 4) Create JWTAuthenticationFilter that extends OncePerRequestFilter and override method and write the logic to check the token that is comming in header. We have to write 5 important logic
 
 Get Token from request
+
 Validate Token
+
 GetUsername from token
+
 Load user associated with this token
+
 set authentication
+
+```
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -267,8 +295,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     }
 }
+```
+
 5) Configure spring security in configuration file:
 
+```
 @Configuration
 public class SecurityConfig {
 
@@ -294,10 +325,13 @@ public class SecurityConfig {
 
 
 }
+```
+
 6) Create JWTRequest and JWTResponse to receive request data and send Login success response.
 
 7)  Create login api to accept username and password and return token if username and password is correct.
 
+```
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -349,4 +383,6 @@ public class AuthController {
     }
 
 }
+```
+
 8) Test Application.
